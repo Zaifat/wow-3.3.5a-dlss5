@@ -1,0 +1,6 @@
+build/
+dist/
+bin/
+obj/
+vendor/*
+!vendor/README.md

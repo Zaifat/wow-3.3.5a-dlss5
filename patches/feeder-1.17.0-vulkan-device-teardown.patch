@@ -1,0 +1,78 @@
+diff --git a/src/dlss5-feed32.cpp b/src/dlss5-feed32.cpp
+index 8bad41d..4c71999 100644
+--- a/src/dlss5-feed32.cpp
++++ b/src/dlss5-feed32.cpp
+@@ -3181,6 +3181,12 @@ static void HostConsumeRequest()
+ // Shared resources (created on the game's D3D11 device)
+ // ---------------------------------------------------------------------------
+ 
++// Set while OnDestroyDevice tears down on a dying Vulkan device. ReShade 6.8 removes the
++// device from its table at the very start of vkDestroyDevice, so any call that ReShade
++// hooks -- vkDestroyImage is the one on this path -- finds no device and faults reading
++// 0x520 inside ReShade32.dll. vkDestroyDevice reclaims those images anyway.
++static bool g_vk_device_dying;
++
+ static void ReleaseShared()
+ {
+     // Vulkan: drop our VkImage aliases of the host's D3D12 textures. The memory belongs
+@@ -3192,10 +3198,10 @@ static void ReleaseShared()
+         if (g.rs_queue != nullptr) g.rs_queue->wait_idle();
+         for (int i = 0; i < FEED_SLOTS; ++i)
+         {
+-            if (g.vk_img[i] != VK_NULL_HANDLE) { g.vk.DestroyImage(g.vk.dev, g.vk_img[i], nullptr); g.vk_img[i] = VK_NULL_HANDLE; }
++            if (g.vk_img[i] != VK_NULL_HANDLE) { if (!g_vk_device_dying) g.vk.DestroyImage(g.vk.dev, g.vk_img[i], nullptr); g.vk_img[i] = VK_NULL_HANDLE; }
+             if (g.vk_mem[i] != VK_NULL_HANDLE) { g.vk.FreeMemory(g.vk.dev, g.vk_mem[i], nullptr);   g.vk_mem[i] = VK_NULL_HANDLE; }
+         }
+-        if (g.vk_panel     != VK_NULL_HANDLE) { g.vk.DestroyImage(g.vk.dev, g.vk_panel, nullptr);    g.vk_panel     = VK_NULL_HANDLE; }
++        if (g.vk_panel     != VK_NULL_HANDLE) { if (!g_vk_device_dying) g.vk.DestroyImage(g.vk.dev, g.vk_panel, nullptr); g.vk_panel = VK_NULL_HANDLE; }
+         if (g.vk_panel_mem != VK_NULL_HANDLE) { g.vk.FreeMemory(g.vk.dev, g.vk_panel_mem, nullptr);  g.vk_panel_mem = VK_NULL_HANDLE; }
+         g.vk_panel_init  = false;
+         g.vk_layout_init = false;   // the next set starts from UNDEFINED again
+@@ -5716,6 +5722,20 @@ static void OnRenderTechnique(reshade::api::effect_runtime *rt, reshade::api::ef
+     FeedFrame(rt, cl, rtv);
+ }
+ 
++// ReShade's vkDestroyDevice deletes every command_queue BEFORE it raises destroy_device
++// (source/vulkan/vulkan_hooks_device.cpp, 6.8.0), so by the time OnDestroyDevice ->
++// HostClose / ReleaseShared call g.rs_queue->wait_idle(), the pointer is dangling and the
++// call faults inside ReShade32.dll (WoW 3.3.5a under DXVK: every resolution change and
++// most exits). Drain while the queue still exists, then forget it: every teardown path
++// below already skips a null rs_queue.
++static void OnDestroyCommandQueue(reshade::api::command_queue *queue)
++{
++    if (queue == nullptr || queue != g.rs_queue) return;
++    Log("[feed32] game command queue destroyed; draining it before the device goes");
++    queue->wait_idle();
++    g.rs_queue = nullptr;
++}
++
+ static void OnDestroyDevice(reshade::api::device *dev)
+ {
+     if (dev->get_api() == reshade::api::device_api::vulkan)
+@@ -5728,8 +5748,10 @@ static void OnDestroyDevice(reshade::api::device *dev)
+     if (!ours) return;
+ 
+     Log("[feed32] game device destroyed; shutting down");
++    g_vk_device_dying = g.is_vulkan;
+     HostClose();     // drain + end the host while the fences are still alive
+     ReleaseShared();
++    g_vk_device_dying = false;
+     g.vk = {};
+     g.rs_dev = nullptr;
+     g.rs_queue = nullptr;
+@@ -6303,6 +6325,7 @@ static void RegisterReShadeCallbacks()
+     reshade::register_event<reshade::addon_event::destroy_effect_runtime>(OnDestroyEffectRuntime);
+     reshade::register_event<reshade::addon_event::reshade_reloaded_effects>(OnReloadedEffects);
+     reshade::register_event<reshade::addon_event::reshade_render_technique>(OnRenderTechnique);
++    reshade::register_event<reshade::addon_event::destroy_command_queue>(OnDestroyCommandQueue);
+     reshade::register_event<reshade::addon_event::destroy_device>(OnDestroyDevice);
+     reshade::register_event<reshade::addon_event::reshade_present>(OnPresent);
+     reshade::register_event<reshade::addon_event::reshade_overlay>(OnOverlay);
+@@ -6324,6 +6347,7 @@ static void UnregisterReShadeCallbacks()
+     reshade::unregister_event<reshade::addon_event::reshade_reloaded_effects>(OnReloadedEffects);
+     reshade::unregister_event<reshade::addon_event::reshade_render_technique>(OnRenderTechnique);
+     reshade::unregister_event<reshade::addon_event::destroy_device>(OnDestroyDevice);
++    reshade::unregister_event<reshade::addon_event::destroy_command_queue>(OnDestroyCommandQueue);
+ }
+ 
+ // ReShade owns add-on registrations per Vulkan instance, while Windows may keep this
