@@ -127,7 +127,7 @@ sealed class MainForm : Form
 
     public MainForm(int startPage = 0)
     {
-        Text = "WoW DLSS 5";
+        Text = "WoW 3.3.5a DLSS 5";
         try { Icon = Icon.ExtractAssociatedIcon(Environment.ProcessPath); } catch { }
         BackColor = Theme.Bg;
         ForeColor = Theme.Text;
@@ -152,8 +152,8 @@ sealed class MainForm : Form
 
         Shown += (_, _) =>
         {
-            if (!Payload.Available) _log.Log(LogKind.Fail, "В программе нет встроенных файлов DLSS — используй собранный WoW-DLSS5.exe.");
-            else _log.Log(LogKind.Info, "Все файлы DLSS 5 уже внутри программы — интернет не нужен.");
+            if (!Payload.Available) _log.Log(LogKind.Fail, "В программе нет встроенных файлов DLSS — используй собранный WoW-3.3.5a-DLSS5.exe.");
+            else _log.Log(LogKind.Info, "Всё для DLSS 5 уже внутри программы. Только LumeniteFX скачивается при установке с GitHub автора; без интернета — встроенный VORT.");
             RunTask(_log, r => Diagnostics.SystemCheck(_s.WowDir, r), quiet: true);
         };
     }
@@ -164,9 +164,9 @@ sealed class MainForm : Form
     {
         var side = new Panel { Dock = DockStyle.Left, Width = 220, BackColor = Theme.Side };
         var nav = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(0, 8, 0, 0) };
-        var head = new Panel { Dock = DockStyle.Top, Height = 96 };
-        head.Controls.Add(new Label { Text = "3.3.5a · Neural Rendering", ForeColor = Theme.Muted, Font = Theme.Small, AutoSize = true, Location = new Point(20, 58) });
-        head.Controls.Add(new Label { Text = "WoW DLSS 5", ForeColor = Theme.Accent, Font = Theme.H1, AutoSize = true, Location = new Point(16, 20) });
+        var head = new Panel { Dock = DockStyle.Top, Height = 124 };
+        head.Controls.Add(new Label { Text = "Neural Rendering", ForeColor = Theme.Muted, Font = Theme.Small, AutoSize = true, Location = new Point(20, 90) });
+        head.Controls.Add(new Label { Text = "WoW 3.3.5a\nDLSS 5", ForeColor = Theme.Accent, Font = Theme.H1, AutoSize = true, Location = new Point(16, 16) });
         side.Controls.Add(nav);
         side.Controls.Add(_sideStatus);
         side.Controls.Add(head);
@@ -349,7 +349,7 @@ sealed class MainForm : Form
     void InstallClicked()
     {
         var st = InstallState.Load(_s.WowDir);
-        if (st != null && MessageBox.Show(this, "DLSS 5 уже установлен. Удалить текущую установку и поставить заново?", "WoW DLSS 5",
+        if (st != null && MessageBox.Show(this, "DLSS 5 уже установлен. Удалить текущую установку и поставить заново?", "WoW 3.3.5a DLSS 5",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
         ReadSettingsUi();
         var s = _s.Clone();
@@ -363,7 +363,7 @@ sealed class MainForm : Form
 
     void UninstallClicked()
     {
-        if (MessageBox.Show(this, "Удалить DLSS 5 и вернуть клиент в исходное состояние?", "WoW DLSS 5",
+        if (MessageBox.Show(this, "Удалить DLSS 5 и вернуть клиент в исходное состояние?", "WoW 3.3.5a DLSS 5",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
         var wow = _s.WowDir;
         RunTask(_log, r => Installer.Uninstall(wow, r));
@@ -558,7 +558,7 @@ sealed class MainForm : Form
         var st = InstallState.Load(_s.WowDir);
         if (st?.Complete != true)
         {
-            MessageBox.Show(this, "Настройки сохранены. DLSS 5 ещё не установлен — они применятся при установке.", "WoW DLSS 5", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "Настройки сохранены. DLSS 5 ещё не установлен — они применятся при установке.", "WoW 3.3.5a DLSS 5", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
         try
@@ -566,9 +566,9 @@ sealed class MainForm : Form
             var changed = StackConfig.Apply(_s.WowDir, st.RenderMode, _s);
             var msg = "Сохранено: " + string.Join(", ", changed) + ".";
             if (Wow.IsRunning(_s.WowDir)) msg += "\n\nWoW запущен — перезапусти игру, чтобы применилось всё (вкл/выкл DLSS 5 и стабилизатор подхватятся сразу).";
-            MessageBox.Show(this, msg, "WoW DLSS 5", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, msg, "WoW 3.3.5a DLSS 5", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-        catch (Exception ex) { MessageBox.Show(this, ex.Message, "WoW DLSS 5", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        catch (Exception ex) { MessageBox.Show(this, ex.Message, "WoW 3.3.5a DLSS 5", MessageBoxButtons.OK, MessageBoxIcon.Error); }
     }
 
     void SaveSettings()

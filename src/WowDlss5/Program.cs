@@ -12,7 +12,7 @@ static class Program
         // Повышенная копия для Vulkan-слоя ReShade (запускается через UAC).
         if (args.Length > 0 && args[0] == "--layer") return VulkanLayer.Run(args);
 
-        // Консольный режим: WoW-DLSS5.exe --cli install|uninstall|apply|check|logs|selftest|verify [--wow <папка>] [--mode vulkan|dx11]
+        // Консольный режим: WoW-3.3.5a-DLSS5.exe --cli install|uninstall|apply|check|logs|selftest|verify [--wow <папка>] [--mode vulkan|dx11]
         if (args.Length > 0 && args[0] == "--cli") return Cli(args);
 
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);

@@ -6,13 +6,13 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <AssemblyName>WoW-DLSS5</AssemblyName>
+    <AssemblyName>WoW-3.3.5a-DLSS5</AssemblyName>
     <RootNamespace>WowDlss5</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <Version>1.0.0</Version>
     <Company>Zaifat</Company>
-    <Product>WoW DLSS 5</Product>
+    <Product>WoW 3.3.5a DLSS 5</Product>
     <Description>DLSS 5 Neural Rendering для World of Warcraft 3.3.5a</Description>
 
     <!-- Один exe без зависимостей: рантайм .NET внутри, файлы DLSS дописываются в конец exe (build.ps1). -->

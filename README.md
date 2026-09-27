@@ -1,4 +1,4 @@
-# WoW DLSS 5
+# WoW 3.3.5a DLSS 5
 
 **English** · [Русский](README.ru.md)
 
@@ -14,7 +14,7 @@ NVIDIA DLSS 5 Neural Rendering for World of Warcraft 3.3.5a (build 12340). One i
 
 ## Install
 
-1. Download `WoW-DLSS5.exe` from [Releases](../../releases/latest).
+1. Download `WoW-3.3.5a-DLSS5.exe` from [Releases](../../releases/latest).
 2. Point it at the folder with `Wow.exe`.
 3. Pick **DirectX 11 (dgVoodoo2)** (recommended) and click **Install**.
 4. Start WoW as usual.
@@ -62,4 +62,4 @@ Requires the .NET 9 SDK, with the files from [vendor/README.md](vendor/README.md
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
 
-The result is `dist\WoW-DLSS5.exe`.
+The result is `dist\WoW-3.3.5a-DLSS5.exe`.

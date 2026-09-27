@@ -221,7 +221,7 @@ static class VulkanLayer
         catch (Exception ex) { error = ex.Message; return false; }
     }
 
-    /// <summary>Точка входа повышенной копии: WoW-DLSS5.exe --layer install|uninstall "exe" [--remove-layer]</summary>
+    /// <summary>Точка входа повышенной копии: WoW-3.3.5a-DLSS5.exe --layer install|uninstall "exe" [--remove-layer]</summary>
     public static int Run(string[] args)
     {
         try

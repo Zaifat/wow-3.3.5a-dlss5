@@ -79,7 +79,7 @@ static class StackConfig
         "enabled=1\r\nmode=2\r\nhdr=-1\r\ndepth_inverted=-1\r\nflags=-1\r\nreset_every=0\r\nrebuild=0\r\nlog_frames=3\r\nhold_strength=0.00\r\n";
 
     public const string DxvkConf =
-        "# WoW DLSS 5 - DXVK for WoW 3.3.5a.\r\n" +
+        "# WoW 3.3.5a DLSS 5 - DXVK settings.\r\n" +
         "# allowFse = False is the one setting the confirmed WoW configuration needed (DLSS5-Feeder issue #15).\r\n" +
         "dxvk.allowFse = False\r\n";
 
